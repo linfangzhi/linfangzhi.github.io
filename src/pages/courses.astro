@@ -1,0 +1,4 @@
+---
+import{getCollection}from'astro:content';import Base from'../layouts/Base.astro';import Card from'../components/Card.astro';const entries=(await getCollection('content')).filter(e=>e.data.type==='course');
+---
+<Base title="Courses"><section class="hero"><h1>Courses</h1><p>按长期 syllabus 推进的音频课程。</p></section><div class="grid">{entries.map(e=><Card entry={e}/>)}</div></Base>

@@ -1,0 +1,4 @@
+---
+const {entry}=Astro.props;const d=entry.data;const href=d.legacyPath||`/content/${entry.id.replace(/\.(md|mdx)$/,'')}/`;
+---
+<article class="card"><div class="meta">{d.category} · {d.date.toLocaleDateString('zh-CN')}{d.duration?` · ${Math.round(d.duration/60)} 分钟`:''}</div><h2><a href={href}>{d.title}</a></h2><p>{d.summary||d.subtitle}</p><div class="tags">{d.tags.map((tag)=><span class="tag">{tag}</span>)}</div></article>

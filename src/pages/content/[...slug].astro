@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+export async function getStaticPaths() {
+  const entries = await getCollection('content');
+  return entries.filter((entry) => !entry.data.legacyPath).map((entry) => ({
+    params: { slug: entry.id.replace(/\.(md|mdx)$/, '') }, props: { entry },
+  }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const durationLabel = d.duration ? ` · ${Math.round(d.duration / 60)} 分钟` : '';
+---
+<Base title={d.title} description={d.summary}>
+  <article class="article" data-pagefind-body>
+    <div class="meta">{d.category} · {d.date.toLocaleDateString('zh-CN')}{durationLabel}</div>
+    <h1 data-pagefind-meta="title">{d.title}</h1>
+    {d.subtitle && <p class="meta">{d.subtitle}</p>}
+    {d.audioUrl ? <audio id="player" controls preload="metadata" src={d.audioUrl}></audio> : d.audioPrivate && <p class="notice">音频仅可在私人网络中访问。</p>}
+    {d.tldr && <><h2>TL;DR</h2><p>{d.tldr}</p></>}
+    {d.keyPoints.length > 0 && <><h2>核心点</h2><ul>{d.keyPoints.map((point) => <li>{point}</li>)}</ul></>}
+    {d.chapters.length > 0 && <><h2>Chapters</h2><div class="chapters">{d.chapters.map((chapter) => <button data-time={chapter.startSeconds}>{new Date(chapter.startSeconds * 1000).toISOString().slice(11, 19)} {chapter.title}</button>)}</div></>}
+    <Content />
+    {d.sources.length > 0 && <><h2>参考资料</h2><ul class="sources">{d.sources.map((source) => <li>{source.publisher} · <a href={source.url} rel="noreferrer">{source.title}</a>{source.publishedAt ? ` · ${source.publishedAt}` : ''}</li>)}</ul></>}
+  </article>
+  <script>
+    document.querySelectorAll<HTMLButtonElement>('[data-time]').forEach((button) => button.onclick = () => {
+      const player = document.querySelector<HTMLAudioElement>('#player');
+      if (player) { player.currentTime = Number(button.dataset.time); player.play(); }
+    });
+  </script>
+</Base>

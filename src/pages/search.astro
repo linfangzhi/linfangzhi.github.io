@@ -1,0 +1,4 @@
+---
+import Base from'../layouts/Base.astro';
+---
+<Base title="Search"><section class="hero"><h1>Search</h1><p>搜索标题、摘要、transcript、tags 和 series。</p></section><div id="search"></div><link href="/pagefind/pagefind-ui.css" rel="stylesheet"/><script is:inline src="/pagefind/pagefind-ui.js"></script><script is:inline>window.addEventListener('DOMContentLoaded',()=>new PagefindUI({element:'#search',showSubResults:true,translations:{placeholder:'搜索方方编辑部'}}))</script></Base>

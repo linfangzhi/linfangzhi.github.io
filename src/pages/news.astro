@@ -1,0 +1,4 @@
+---
+import{getCollection}from'astro:content';import Base from'../layouts/Base.astro';import Card from'../components/Card.astro';const entries=(await getCollection('content')).filter(e=>e.data.type==='briefing');
+---
+<Base title="News"><section class="hero"><h1>News</h1><p>经过筛选、核实和分析的 Morning Brief。</p></section><div class="grid">{entries.map(e=><Card entry={e}/>)}</div></Base>

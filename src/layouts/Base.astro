@@ -1,0 +1,4 @@
+---
+import '../styles/global.css';const {title='方方编辑部',description='私人 Podcast 电台、AI 教师与资讯编辑部'}=Astro.props;
+---
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/><meta name="description" content={description}/><title>{title}｜方方编辑部</title><link rel="alternate" type="application/rss+xml" title="方方编辑部 RSS" href="/rss.xml"/></head><body><header><nav class="wrap nav"><a class="brand" href="/">方方编辑部</a><a href="/podcast/">Podcast</a><a href="/courses/">Courses</a><a href="/news/">News</a><a href="/deep-dive/">Deep Dive</a><a href="/blog/">Blog</a><a href="/archive/">Archive</a><a href="/search/">Search</a></nav></header><main class="wrap"><slot/></main><footer><div class="wrap">方方编辑部 · LLM decides · Code executes · State persists · Sources remain auditable</div></footer></body></html>

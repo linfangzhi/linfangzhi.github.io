@@ -1,0 +1,4 @@
+---
+import{getCollection,render}from'astro:content';import Base from'../../../../layouts/Base.astro';export async function getStaticPaths(){const entries=await getCollection('content');return entries.filter(e=>e.data.legacyPath).map(entry=>{const p=entry.data.legacyPath.split('/').filter(Boolean);return{params:{year:p[0],month:p[1],day:p[2],slug:p.slice(3).join('/')},props:{entry}}})}const{entry}=Astro.props;const{Content}=await render(entry);const d=entry.data;
+---
+<Base title={d.title} description={d.summary}><article class="article" data-pagefind-body><div class="meta">Blog · {d.date.toLocaleDateString('zh-CN')}</div><h1>{d.title}</h1><p class="meta">{d.subtitle}</p><Content/><div class="tags">{d.tags.map(t=><span class="tag">{t}</span>)}</div></article></Base>

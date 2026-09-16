@@ -1,0 +1,4 @@
+---
+import{getCollection}from'astro:content';import Base from'../layouts/Base.astro';const entries=(await getCollection('content')).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());
+---
+<Base title="Archive"><section class="hero"><h1>Archive</h1></section><div class="article">{entries.map(e=><p><time>{e.data.date.toISOString().slice(0,10)}</time> · <a href={e.data.legacyPath||`/content/${e.id.replace(/\.(md|mdx)$/,'')}/`}>{e.data.title}</a></p>)}</div></Base>

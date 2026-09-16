@@ -1,0 +1,4 @@
+---
+import{getCollection}from'astro:content';import Base from'../layouts/Base.astro';import Card from'../components/Card.astro';const entries=(await getCollection('content')).filter(e=>['deep_dive','on_demand'].includes(e.data.type));
+---
+<Base title="Deep Dive"><section class="hero"><h1>Deep Dive</h1><p>从事实到机制，再到与你有关的判断。</p></section><div class="grid">{entries.map(e=><Card entry={e}/>)}</div></Base>

@@ -1,0 +1,4 @@
+---
+import{getCollection}from'astro:content';import Base from'../layouts/Base.astro';import Card from'../components/Card.astro';const entries=(await getCollection('content')).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());
+---
+<Base><section class="hero"><h1>把无法读文章的时间，变成一段好内容。</h1><p>私人 Podcast 电台、AI 教师与资讯编辑部。新闻不只是播报，课程不写成教科书，每一期都保留可追溯的来源。</p></section><section class="grid" data-pagefind-body>{entries.slice(0,12).map((entry)=><Card entry={entry}/>)}</section></Base>

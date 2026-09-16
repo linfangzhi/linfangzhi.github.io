@@ -1,5 +1,8 @@
 _site
 node_modules
+node_modules.failed-*
+.astro
+dist
 npm-debug.log
 .DS_Store
 */.DS_Store
