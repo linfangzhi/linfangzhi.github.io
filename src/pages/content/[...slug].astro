@@ -11,22 +11,54 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
 const durationLabel = d.duration ? ` · ${Math.round(d.duration / 60)} 分钟` : '';
+const categoryEmoji = d.type === 'briefing' ? '🗞️' : d.type === 'course' ? '🎓' : d.type === 'deep_dive' || d.type === 'on_demand' ? '🔭' : '✍️';
 ---
 <Base title={d.title} description={d.summary}>
   <article class="article" data-pagefind-body>
-    <div class="meta">{d.category} · {d.date.toLocaleDateString('zh-CN')}{durationLabel}</div>
-    <h1 data-pagefind-meta="title">{d.title}</h1>
-    {d.subtitle && <p class="meta">{d.subtitle}</p>}
-    {d.audioUrl ? <audio id="player" controls preload="metadata" src={d.audioUrl}></audio> : d.audioPrivate && <p class="notice">音频仅可在私人网络中访问。</p>}
-    {d.tldr && <><h2>TL;DR</h2><p>{d.tldr}</p></>}
-    {d.keyPoints.length > 0 && <><h2>核心点</h2><ul>{d.keyPoints.map((point) => <li>{point}</li>)}</ul></>}
-    {d.chapters.length > 0 && <><h2>Chapters</h2><div class="chapters">{d.chapters.map((chapter) => <button data-time={chapter.startSeconds}>{new Date(chapter.startSeconds * 1000).toISOString().slice(11, 19)} {chapter.title}</button>)}</div></>}
-    <Content />
-    {d.sources.length > 0 && <><h2>参考资料</h2><ul class="sources">{d.sources.map((source) => <li>{source.publisher} · <a href={source.url} rel="noreferrer">{source.title}</a>{source.publishedAt ? ` · ${source.publishedAt}` : ''}</li>)}</ul></>}
+    <header class="article-hero">
+      <div class="eyebrow">{categoryEmoji} {d.category} <span>·</span> {d.date.toLocaleDateString('zh-CN')}{durationLabel}</div>
+      <h1 data-pagefind-meta="title">{d.title}</h1>
+      {d.subtitle && <p class="subtitle">{d.subtitle}</p>}
+      <div class="article-tags">{d.tags.map((tag) => <span>#{tag}</span>)}</div>
+    </header>
+    {d.audioUrl ? <section class="audio-card" aria-label="节目音频">
+      <div class="audio-card-title"><span>🎧</span><div><strong>收听本期节目</strong><small id="progress-note">播放进度会保存在这台设备</small></div></div>
+      <audio id="player" controls preload="metadata" src={d.audioUrl}></audio>
+      <button id="clear-progress" class="text-button" type="button">清除播放记录</button>
+    </section> : d.audioPrivate && <p class="notice">🔒 音频仅可在私人网络中访问。</p>}
+    {d.tldr && <section class="summary-box"><h2>⚡ 一分钟了解</h2><p>{d.tldr}</p></section>}
+    {d.keyPoints.length > 0 && <section class="key-points"><h2>📌 核心观点</h2><ol>{d.keyPoints.map((point) => <li>{point}</li>)}</ol></section>}
+    {d.chapters.length > 0 && <section><h2>🧭 节目章节</h2><div class="chapters">{d.chapters.map((chapter) => <button data-time={chapter.startSeconds}>{new Date(chapter.startSeconds * 1000).toISOString().slice(11, 19)} {chapter.title}</button>)}</div></section>}
+    <div class="article-content"><Content /></div>
+    {d.sources.length > 0 && <section class="source-section"><h2>🔗 参考资料</h2><ol class="sources">{d.sources.map((source) => <li><span>{source.publisher}</span><a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>{source.publishedAt && <time>{source.publishedAt.slice(0, 10)}</time>}</li>)}</ol></section>}
   </article>
   <script>
+    const player = document.querySelector<HTMLAudioElement>('#player');
+    const note = document.querySelector<HTMLElement>('#progress-note');
+    const storageKey = `fangfang:audio-progress:${location.pathname}`;
+    let lastSavedSecond = -1;
+    if (player) {
+      player.addEventListener('loadedmetadata', () => {
+        const saved = Number(localStorage.getItem(storageKey) || 0);
+        if (saved > 5 && saved < player.duration - 10) {
+          player.currentTime = saved;
+          if (note) note.textContent = `已恢复到 ${Math.floor(saved / 60)}:${String(Math.floor(saved % 60)).padStart(2, '0')}`;
+        }
+      });
+      player.addEventListener('timeupdate', () => {
+        const second = Math.floor(player.currentTime);
+        if (second !== lastSavedSecond && second % 3 === 0) {
+          localStorage.setItem(storageKey, String(player.currentTime));
+          lastSavedSecond = second;
+        }
+      });
+      player.addEventListener('ended', () => localStorage.removeItem(storageKey));
+      document.querySelector<HTMLButtonElement>('#clear-progress')?.addEventListener('click', () => {
+        localStorage.removeItem(storageKey); player.currentTime = 0;
+        if (note) note.textContent = '播放记录已清除';
+      });
+    }
     document.querySelectorAll<HTMLButtonElement>('[data-time]').forEach((button) => button.onclick = () => {
-      const player = document.querySelector<HTMLAudioElement>('#player');
       if (player) { player.currentTime = Number(button.dataset.time); player.play(); }
     });
   </script>
